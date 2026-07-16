@@ -1,6 +1,13 @@
 ﻿# Abaikan semua file CSV dan folder data mentah
 *.csv
-/data_mentah/
-*.csv
 *.xlsx
 *.xls
+/data_mentah/
+
+# Tapi JANGAN abaikan folder hasil, dashboard butuh file-file ini
+!03_Hasil/
+!03_Hasil/*.csv
+
+# File besar - tidak dibutuhkan dashboard, terlalu besar untuk GitHub
+03_Hasil/04_data_siap_modeling_final.csv
+03_Hasil/05_data_dengan_fitur_sarima.csv
