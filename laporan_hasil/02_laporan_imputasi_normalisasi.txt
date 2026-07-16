@@ -1,0 +1,50 @@
+======================================================================
+STEP 2 - IMPUTASI, NORMALISASI, FITUR TETANGGA
+======================================================================
+Waktu proses : 2026-07-13 09:53:58.475259
+File input   : 03_Hasil/01_data_bersih_curah_hujan_sumbar.csv
+
+Shape data awal   : (518322, 7)
+Jumlah stasiun    : 129
+Missing value awal: 124,183 (23.96%)
+
+======================================================================
+STEP 2A - INTERPOLASI LINEAR (gap <= 7 hari)
+======================================================================
+Missing sebelum interpolasi        : 124,183
+Terisi oleh interpolasi linear      : 7,034
+Missing tersisa (gap panjang/ujung) : 117,149
+
+======================================================================
+STEP 2B - KNN IMPUTER (k=5, korelasi antar stasiun)
+======================================================================
+Missing value setelah KNN Imputer: 0
+
+======================================================================
+STEP 2C - NORMALISASI (MinMaxScaler 0-1, per stasiun)
+======================================================================
+Normalisasi selesai. Rentang nilai tiap stasiun sekarang 0-1.
+
+======================================================================
+STEP 2D - FITUR TETANGGA TERDEKAT (k=5, jarak Haversine)
+======================================================================
+Contoh tetangga terdekat untuk 3 stasiun pertama:
+  Air Pura (13010103a) -> tetangga: ['BPK Linggo Sari Baganti', 'BPK Padang Laban', 'Lunang', 'Kambang', 'Pekonina']
+  BPK Padang Laban (13010202a) -> tetangga: ['BPK Linggo Sari Baganti', 'Air Pura', 'Kambang', 'Lunang', 'Pekonina']
+  Kambang (13010302a) -> tetangga: ['BPK Batang Kapas', 'PU Batang Kapas - Tanah Kareh', 'BPK Linggo Sari Baganti', 'BPK Padang Laban', 'Air Pura']
+
+Fitur RAINFALL_TETANGGA_AVG berhasil dihitung untuk 129 stasiun.
+
+======================================================================
+STEP 2E - SUSUN DATA FINAL
+======================================================================
+Shape data final       : (518322, 10)
+Total baris hasil imputasi: 124,183 (23.96%)
+Missing value tersisa  : 0
+
+======================================================================
+OUTPUT TERSIMPAN
+======================================================================
+1. Data siap modeling         : 03_Hasil\02_data_siap_modeling.csv
+2. Mapping tetangga stasiun   : 03_Hasil\02_mapping_tetangga_stasiun.csv
+3. Laporan proses (txt)       : laporan_hasil\02_laporan_imputasi_normalisasi.txt

@@ -1,0 +1,111 @@
+======================================================================
+STEP 4 - FEATURE ENGINEERING
+======================================================================
+Waktu proses : 2026-07-13 10:08:10.860133
+File input   : 03_Hasil/02_data_siap_modeling.csv
+
+Shape data awal : (518322, 10)
+Jumlah stasiun   : 129
+
+======================================================================
+STEP 4A - FITUR WAKTU (bulan, hari-dalam-tahun, encoding siklikal)
+======================================================================
+Fitur dibuat: BULAN, HARI_TAHUN, SIN_BULAN, COS_BULAN, SIN_HARI_TAHUN, COS_HARI_TAHUN
+
+======================================================================
+STEP 4B - FITUR LAG: [1, 2, 3, 7, 14, 30] hari
+======================================================================
+Fitur lag dibuat: ['LAG_1', 'LAG_2', 'LAG_3', 'LAG_7', 'LAG_14', 'LAG_30']
+
+======================================================================
+STEP 4C - FITUR ROLLING: window [3, 7, 14, 30] hari (mean/max/sum)
+======================================================================
+Fitur rolling dibuat untuk window: [3, 7, 14, 30] (mean, max, sum) -> 12 kolom
+
+======================================================================
+STEP 4D - FITUR CONSEC_RAIN (hari hujan berturut-turut, s/d kemarin)
+======================================================================
+Fitur CONSEC_RAIN dibuat (jumlah hari hujan berturut-turut sampai H-1).
+
+======================================================================
+STEP 4E - FITUR SPASIAL TETANGGA (lag & rolling dari RAINFALL_TETANGGA_AVG)
+======================================================================
+Fitur dibuat: TETANGGA_LAG1, TETANGGA_ROLL_MEAN_7, SPASIAL_X_ROLL7
+
+======================================================================
+STEP 4F - TARGET REGRESI H+1 s/d H+7 (nilai curah hujan masa depan)
+======================================================================
+Target dibuat: ['TARGET_H1', 'TARGET_H2', 'TARGET_H3', 'TARGET_H4', 'TARGET_H5', 'TARGET_H6', 'TARGET_H7']
+
+======================================================================
+STEP 4G - LABEL KLASIFIKASI EKSTREM (maksimum H+1 s/d H+7)
+======================================================================
+LABEL_EKSTREM_100_7HARI (label utama) : 16,155 positif dari 518,193 baris valid (3.118%)
+LABEL_EKSTREM_150_7HARI (info tambahan): 3,597 positif dari 518,193 baris valid (0.694%)
+
+======================================================================
+STEP 4H - BUANG BARIS DENGAN FITUR LAG TIDAK LENGKAP (awal deret)
+======================================================================
+Baris sebelum buang (lag tidak lengkap di awal deret tiap stasiun): 518,322
+Baris setelah buang                                              : 514,452
+Baris terbuang (30 hari pertama tiap 129 stasiun, wajar)         : 3,870
+
+[CATATAN] Baris dengan TARGET_H1..H7 / LABEL kosong (7 hari terakhir tiap stasiun)
+TETAP DISIMPAN dalam dataset (untuk keperluan prediksi real-time / dashboard),
+tapi HARUS di-drop saat training model (gunakan .dropna(subset=['LABEL_EKSTREM_100_7HARI']) sebelum fit).
+
+======================================================================
+RINGKASAN KOLOM DATASET FINAL
+======================================================================
+Total kolom: 48
+Total baris: 514,452
+
+Daftar kolom:
+  - STATION_KEY
+  - NAMA_STASIUN
+  - LATITUDE
+  - LONGITUDE
+  - ELEVASI_M
+  - TANGGAL
+  - RAINFALL_MM
+  - RAINFALL_MM_NORM
+  - RAINFALL_TETANGGA_AVG
+  - IS_IMPUTED
+  - BULAN
+  - HARI_TAHUN
+  - SIN_BULAN
+  - COS_BULAN
+  - SIN_HARI_TAHUN
+  - COS_HARI_TAHUN
+  - LAG_1
+  - LAG_2
+  - LAG_3
+  - LAG_7
+  - LAG_14
+  - LAG_30
+  - ROLL_MEAN_3
+  - ROLL_MAX_3
+  - ROLL_SUM_3
+  - ROLL_MEAN_7
+  - ROLL_MAX_7
+  - ROLL_SUM_7
+  - ROLL_MEAN_14
+  - ROLL_MAX_14
+  - ROLL_SUM_14
+  - ROLL_MEAN_30
+  - ROLL_MAX_30
+  - ROLL_SUM_30
+  - CONSEC_RAIN
+  - TETANGGA_LAG1
+  - TETANGGA_ROLL_MEAN_7
+  - SPASIAL_X_ROLL7
+  - TARGET_H1
+  - TARGET_H2
+  - TARGET_H3
+  - TARGET_H4
+  - TARGET_H5
+  - TARGET_H6
+  - TARGET_H7
+  - MAX_RAINFALL_7HARI_KEDEPAN
+  - LABEL_EKSTREM_100_7HARI
+  - LABEL_EKSTREM_150_7HARI

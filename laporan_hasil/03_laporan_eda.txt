@@ -1,0 +1,88 @@
+======================================================================
+STEP 3 - EXPLORATORY DATA ANALYSIS (EDA)
+======================================================================
+Waktu proses : 2026-07-13 10:02:30.408592
+File input   : 03_Hasil/02_data_siap_modeling.csv
+
+Shape data      : (518322, 12)
+Jumlah stasiun  : 129
+Rentang tanggal : 2015-01-01 s/d 2025-12-31
+
+======================================================================
+STEP 3A - STATISTIK DESKRIPTIF UMUM (RAINFALL_MM, hasil imputasi)
+======================================================================
+count    518322.000
+mean          8.326
+std          16.741
+min           0.000
+25%           0.000
+50%           1.000
+75%           9.533
+max         439.000
+
+Hari tanpa hujan (0 mm)     : 232,681 (44.89%)
+Hari hujan (>0 mm)          : 285,641 (55.11%)
+
+======================================================================
+STEP 3B - KLASIFIKASI INTENSITAS HUJAN HARIAN (kriteria BMKG)
+======================================================================
+
+Jumlah hari per kategori (seluruh stasiun & tahun):
+  Tidak Hujan                 :  232,681 hari (44.891%)
+  Ringan (0-20mm)             :  216,674 hari (41.803%)
+  Sedang (20-50mm)            :   52,397 hari (10.109%)
+  Lebat (50-100mm)            :   14,019 hari ( 2.705%)
+  Sangat Lebat (100-150mm)    :    2,004 hari ( 0.387%)
+  Ekstrem (>150mm)            :      547 hari ( 0.106%)
+
+Total kejadian >=100mm (Sangat Lebat + Ekstrem): 2,551
+Total kejadian >=150mm (Ekstrem)                : 547
+
+======================================================================
+STEP 3C - STATISTIK PER STASIUN (Top 10 rata-rata tertinggi)
+======================================================================
+STATION_KEY            NAMA_STASIUN  rata2_mm  median_mm  max_mm  std_mm  hari_ekstrem
+  13051501a           Kandang Ampek     15.28       5.00   214.0   23.78             8
+  13120601a            Gunung Tuleh     14.81       4.18   150.0   22.39             3
+  13121101a                   Sasak     14.56       4.00   328.0   24.01            14
+  13051601a                Tandikat     13.80       3.00   296.0   24.29            18
+  13050701a          Sei Geringging     13.12       2.90   302.0   22.78            10
+  13710704a Water Plan Semen Padang     12.71       2.94   260.5   22.36             8
+  13120402a            UPTB Talamau     12.60       4.87   210.0   19.50             6
+  13051503a Staklim Padang Pariaman     12.46       2.70   257.5   22.72            16
+  13710701a    Tambang Semen Padang     12.36       2.00   261.0   23.79            18
+  13050201a                  Kuliek     12.35       0.00   337.0   25.13            13
+
+======================================================================
+STEP 3D - DETEKSI OUTLIER (metode IQR per stasiun)
+======================================================================
+
+Total outlier terdeteksi (seluruh stasiun): 52,876
+
+Top 10 stasiun dengan outlier terbanyak (kemungkinan rawan hujan ekstrem):
+STATION_KEY       NAMA_STASIUN  BATAS_ATAS_IQR_MM  JUMLAH_OUTLIER  PERSEN_OUTLIER
+  13021301a       Muaro Pingai               8.64             632          15.729
+  13030901a            Kumanis              12.50             606          15.082
+  13760102a   Payakumbuh Barat              12.50             597          14.858
+  13030402a    Muara Sijunjung              15.00             590          14.684
+  13021201a  BPK X Koto Diatas              10.22             557          13.863
+  13040202a       Ombilin weir               7.50             547          13.614
+  13030902a       Sumpur Kudus              12.50             547          13.614
+  13070402a              Luhak              14.45             543          13.514
+  13010601a BPK Bayang Api-Api              20.00             541          13.464
+  13021104a     Balitbu Sumani              12.50             534          13.290
+
+[CATATAN] Outlier IQR di data curah hujan TIDAK selalu berarti data error -
+bisa jadi itu justru kejadian hujan ekstrem asli yang penting untuk mitigasi bencana.
+Perlu pengecekan silang dengan RAINFALL_TETANGGA_AVG sebelum dianggap anomali sensor.
+
+======================================================================
+STEP 3E - VISUALISASI
+======================================================================
+Saved: 01_time_series_regional.png
+Saved: 02_boxplot_musiman.png
+Saved: 03_tren_tahunan_ekstrem.png
+Saved: 04_peta_sebaran_stasiun.png
+Saved: 05_distribusi_curah_hujan.png
+
+Semua visualisasi tersimpan di folder: 03_Hasil/plots_eda/

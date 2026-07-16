@@ -1,0 +1,36 @@
+======================================================================
+STEP 5 - TRAINING XGBOOST PREDIKSI GENUINE H+1 s/d H+7
+======================================================================
+Waktu proses : 2026-07-15 18:03:45.575071
+Jumlah stasiun : 129
+Jumlah baris data : 518,322
+Tanggal terakhir data historis : 2025-12-31
+
+======================================================================
+STEP 5A - FEATURE ENGINEERING (lag, rolling, tetangga, kalender)
+======================================================================
+Fitur dibangun: ['LAG_1', 'LAG_3', 'LAG_7', 'ROLL_MEAN_3', 'ROLL_MEAN_7', 'ROLL_MEAN_14', 'TETANGGA_LAG1', 'DOY_SIN', 'DOY_COS', 'BULAN_SIN', 'BULAN_COS']
+Cutoff train/holdout : 2023-12-31 (train sebelum ini, validasi setelahnya, konsisten dgn backtest SARIMA)
+
+======================================================================
+STEP 5B - TRAINING MODEL XGBOOST PER HORIZON (regional gabungan)
+======================================================================
+H+1: MAE=10.792 mm | RMSE=19.201 mm | n_test=94,170
+H+2: MAE=10.967 mm | RMSE=19.365 mm | n_test=94,041
+H+3: MAE=11.001 mm | RMSE=19.365 mm | n_test=93,912
+H+4: MAE=11.052 mm | RMSE=19.365 mm | n_test=93,783
+H+5: MAE=11.120 mm | RMSE=19.436 mm | n_test=93,654
+H+6: MAE=11.164 mm | RMSE=19.480 mm | n_test=93,525
+H+7: MAE=11.211 mm | RMSE=19.496 mm | n_test=93,396
+
+Ringkasan akurasi semua horizon:
+  MAE rata-rata seluruh horizon  : 11.044 mm
+  RMSE rata-rata seluruh horizon : 19.387 mm
+
+======================================================================
+OUTPUT TERSIMPAN
+======================================================================
+1. Model XGBoost per horizon (7 file) : 03_Hasil/models/xgb_horizon_h1.pkl s/d h7.pkl
+2. Laporan akurasi per horizon         : 03_Hasil\05_akurasi_xgboost_per_horizon.csv
+3. Prediksi H+1..H+7 terkini            : 03_Hasil\05_prediksi_jangka_pendek_terkini.csv
+4. Laporan proses (txt)                 : laporan_hasil\05_laporan_training_xgboost.txt

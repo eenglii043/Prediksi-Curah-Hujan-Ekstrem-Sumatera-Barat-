@@ -1,0 +1,151 @@
+======================================================================
+STEP 5 - MODELING HYBRID SARIMA-XGBOOST
+======================================================================
+Waktu proses : 2026-07-15 07:37:33.596966
+File input   : 03_Hasil/04_data_siap_modeling_final.csv
+
+Shape data awal : (514452, 48)
+Jumlah stasiun   : 129
+Target           : LABEL_EKSTREM_100_7HARI
+
+======================================================================
+STEP 5A - SARIMA: TREN & MUSIMAN REGIONAL (agregasi bulanan)
+======================================================================
+Jumlah titik data bulanan untuk SARIMA: 132
+Order SARIMA         : (1, 1, 1)
+Seasonal order SARIMA: (1, 1, 1, 12) (musiman tahunan, m=12)
+
+SARIMA berhasil dilatih pada rata-rata curah hujan regional bulanan.
+                                     SARIMAX Results                                      
+==========================================================================================
+Dep. Variable:                        RAINFALL_MM   No. Observations:                  132
+Model:             SARIMAX(1, 1, 1)x(1, 1, 1, 12)   Log Likelihood                -259.350
+Date:                            Wed, 15 Jul 2026   AIC                            528.701
+Time:                                    07:37:44   BIC                            541.971
+Sample:                                01-01-2015   HQIC                           534.078
+                                     - 12-01-2025                                         
+Covariance Type:                              opg                                         
+==========================================================================================
+
+[CATATAN METODOLOGI] SARIMA dilatih pada SELURUH periode 2015-2025 sekaligus
+(bukan rolling/incremental) karena fungsinya di sini adalah dekomposisi
+tren-musiman regional sebagai FITUR untuk XGBoost, bukan sebagai model
+forecast independen. Untuk deployment produksi, SARIMA sebaiknya di-refit
+berkala (mis. tiap awal bulan) dengan data terbaru.
+
+Fitur SARIMA berhasil ditambahkan ke data harian:
+  - SARIMA_MUSIMAN : nilai tren-musiman regional (mm/hari, hasil SARIMA bulanan)
+  - SARIMA_RESIDU  : RAINFALL_MM - SARIMA_MUSIMAN (deviasi lokal dari baseline regional)
+
+Model SARIMA disimpan: 03_Hasil/model/sarima_model.pkl
+
+======================================================================
+STEP 5B - PERSIAPAN DATA XGBOOST
+======================================================================
+Baris sebelum buang (label kosong, 7 hari terakhir tiap stasiun): 514,452
+Baris setelah buang                                             : 514,323
+
+Jumlah fitur dipakai XGBoost: 31
+Daftar fitur: ['RAINFALL_TETANGGA_AVG', 'BULAN', 'HARI_TAHUN', 'SIN_BULAN', 'COS_BULAN', 'SIN_HARI_TAHUN', 'COS_HARI_TAHUN', 'LAG_1', 'LAG_2', 'LAG_3', 'LAG_7', 'LAG_14', 'LAG_30', 'ROLL_MEAN_3', 'ROLL_MAX_3', 'ROLL_SUM_3', 'ROLL_MEAN_7', 'ROLL_MAX_7', 'ROLL_SUM_7', 'ROLL_MEAN_14', 'ROLL_MAX_14', 'ROLL_SUM_14', 'ROLL_MEAN_30', 'ROLL_MAX_30', 'ROLL_SUM_30', 'CONSEC_RAIN', 'TETANGGA_LAG1', 'TETANGGA_ROLL_MEAN_7', 'SPASIAL_X_ROLL7', 'SARIMA_MUSIMAN', 'SARIMA_RESIDU']
+
+======================================================================
+STEP 5C - TIME SERIES CROSS VALIDATION (5 fold)
+======================================================================
+
+--- Fold 1 ---
+  Periode train: 2015-01-31T00:00:00.000000000 s/d 2016-11-27T00:00:00.000000000 (86,043 baris, 618 positif)
+  Periode test : 2016-11-28T00:00:00.000000000 s/d 2018-09-22T00:00:00.000000000 (85,656 baris, 1,220 positif)
+  ROC-AUC: 0.6415 | PR-AUC: 0.0257 | F1(thr=0.5): 0.0444
+
+--- Fold 2 ---
+  Periode train: 2015-01-31T00:00:00.000000000 s/d 2018-09-22T00:00:00.000000000 (171,699 baris, 1,838 positif)
+  Periode test : 2018-09-23T00:00:00.000000000 s/d 2020-07-17T00:00:00.000000000 (85,656 baris, 3,047 positif)
+  ROC-AUC: 0.6044 | PR-AUC: 0.0612 | F1(thr=0.5): 0.1048
+
+--- Fold 3 ---
+  Periode train: 2015-01-31T00:00:00.000000000 s/d 2020-07-17T00:00:00.000000000 (257,355 baris, 4,885 positif)
+  Periode test : 2020-07-18T00:00:00.000000000 s/d 2022-05-12T00:00:00.000000000 (85,656 baris, 3,244 positif)
+  ROC-AUC: 0.6104 | PR-AUC: 0.0518 | F1(thr=0.5): 0.0962
+
+--- Fold 4 ---
+  Periode train: 2015-01-31T00:00:00.000000000 s/d 2022-05-12T00:00:00.000000000 (343,011 baris, 8,129 positif)
+  Periode test : 2022-05-13T00:00:00.000000000 s/d 2024-03-06T00:00:00.000000000 (85,656 baris, 4,024 positif)
+  ROC-AUC: 0.6307 | PR-AUC: 0.0733 | F1(thr=0.5): 0.1215
+
+--- Fold 5 ---
+  Periode train: 2015-01-31T00:00:00.000000000 s/d 2024-03-06T00:00:00.000000000 (428,667 baris, 12,153 positif)
+  Periode test : 2024-03-07T00:00:00.000000000 s/d 2025-12-30T00:00:00.000000000 (85,656 baris, 3,939 positif)
+  ROC-AUC: 0.6993 | PR-AUC: 0.1184 | F1(thr=0.5): 0.1560
+
+======================================================================
+RINGKASAN CROSS VALIDATION (rata-rata seluruh fold)
+======================================================================
+ROC-AUC rata-rata: 0.6372 (+/- 0.0378)
+PR-AUC rata-rata : 0.0661 (+/- 0.0341)
+F1 rata-rata      : 0.1046 (+/- 0.0407)
+
+======================================================================
+STEP 5D - MODEL FINAL (dilatih pada seluruh data) & THRESHOLD TUNING
+======================================================================
+Threshold terbaik (memaksimalkan F1 di data validasi): 0.660
+  Pada threshold ini -> Precision: 0.1393, Recall: 0.2325, F1: 0.1742
+
+--- Classification report (threshold default 0.5) ---
+              precision    recall  f1-score   support
+
+           0     0.9681    0.7833    0.8660     81717
+           1     0.0937    0.4648    0.1560      3939
+
+    accuracy                         0.7687     85656
+   macro avg     0.5309    0.6241    0.5110     85656
+weighted avg     0.9279    0.7687    0.8333     85656
+
+
+--- Classification report (threshold tuned 0.660) ---
+              precision    recall  f1-score   support
+
+           0     0.9618    0.9307    0.9460     81717
+           1     0.1393    0.2325    0.1742      3939
+
+    accuracy                         0.8986     85656
+   macro avg     0.5505    0.5816    0.5601     85656
+weighted avg     0.9239    0.8986    0.9105     85656
+
+
+Confusion Matrix (threshold tuned):
+                 Prediksi Tidak Ekstrem | Prediksi Ekstrem
+Aktual Tidak Ekstrem:      76,055         |      5,662
+Aktual Ekstrem:             3,023         |        916
+
+[CATATAN MITIGASI BENCANA] Untuk konteks early warning, RECALL lebih diprioritaskan
+daripada precision (lebih baik false alarm daripada lolos kejadian ekstrem).
+Threshold bisa diturunkan dari nilai optimal-F1 di atas jika BPBD/BMKG ingin
+recall lebih tinggi meski precision turun -- ini keputusan operasional, bukan teknis.
+
+======================================================================
+STEP 5E - FEATURE IMPORTANCE (XGBoost)
+======================================================================
+                fitur  importance
+          ROLL_MAX_30    0.107807
+       SARIMA_MUSIMAN    0.058143
+          ROLL_MAX_14    0.047708
+RAINFALL_TETANGGA_AVG    0.045778
+          CONSEC_RAIN    0.044236
+           HARI_TAHUN    0.042603
+       SIN_HARI_TAHUN    0.039139
+                BULAN    0.038011
+       COS_HARI_TAHUN    0.037569
+            SIN_BULAN    0.036113
+               LAG_14    0.034787
+           ROLL_MAX_7    0.031728
+ TETANGGA_ROLL_MEAN_7    0.031422
+            COS_BULAN    0.029897
+          ROLL_SUM_30    0.028692
+
+======================================================================
+STEP 5F - SIMPAN MODEL & METADATA
+======================================================================
+1. Model XGBoost final : 03_Hasil/model/xgboost_model_final.pkl
+2. Model SARIMA        : 03_Hasil/model/sarima_model.pkl
+3. Metadata model      : 03_Hasil/model/metadata.pkl
+4. Dataset + fitur SARIMA: 03_Hasil/05_data_dengan_fitur_sarima.csv

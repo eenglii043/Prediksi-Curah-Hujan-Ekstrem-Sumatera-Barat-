@@ -1,0 +1,68 @@
+======================================================================
+STEP 1 - DATA CLEANING: CURAH HUJAN SUMATERA BARAT
+======================================================================
+Waktu proses    : 2026-07-13 09:53:37.494884
+File input      : gabungan_11_file.csv
+
+Jumlah baris awal        : 439,955
+Jumlah POS HUJAN ID awal : 164
+Jumlah NAME unik awal    : 161
+
+=============== =======================================================
+STEP 2 - PENGGABUNGAN STASIUN DUPLIKAT (NAME sama, ID beda)
+======================================================================
+Ditemukan 3 nama stasiun dengan >1 ID:
+  - BPBD Bukittinggi: ['13750101a', '13750203a'] -> digabung, ID utama = 13750101a
+  - Bonjol: ['13080401a', '13080402a'] -> digabung, ID utama = 13080401a
+  - Guguak: ['13070202a', '13070203a'] -> digabung, ID utama = 13070203a
+
+Baris sebelum gabung overlap : 439,955
+Baris setelah gabung overlap : 438,348 (selisih 1,607 baris overlap terbuang)
+
+Jumlah stasiun setelah penggabungan: 161
+
+======================================================================
+STEP 3 - PENANGANAN SENTINEL VALUE (8888 / 9999)
+======================================================================
+  Nilai 8888 (di bawah ambang ukur): 9,753 baris -> di-set 0 mm
+  Nilai 9999 (data tidak terukur)  : 25,878 baris -> di-set NaN (diimputasi di Step 2)
+
+Total baris sentinel: 35,631
+
+======================================================================
+STEP 4 - PENANGANAN RAINFALL TRACE = 'Y'
+======================================================================
+Baris dengan TRACE = 'Y' : 351 -> RAINFALL DAY MM di-set 0 mm
+
+======================================================================
+STEP 5 - REINDEX KE DERET HARIAN PENUH & HITUNG KELENGKAPAN
+======================================================================
+Total hari acuan (2015-01-01 s/d 2025-12-31): 4,018 hari
+
+Stasiun dengan data 100% kosong/sentinel (dibuang otomatis): 8
+Statistik kelengkapan data seluruh 153 stasiun (dengan data valid):
+count    153.00
+mean      66.68
+std       24.29
+min        0.22
+25%       66.03
+50%       73.39
+75%       80.19
+max      100.00
+
+======================================================================
+STEP 6 - SELEKSI STASIUN FINAL (threshold >= 50% lengkap)
+======================================================================
+Jumlah stasiun lolos threshold : 129
+Jumlah stasiun TIDAK lolos     : 24
+
+Shape data bersih final : (518322, 7)
+Jumlah stasiun final    : 129
+Missing value tersisa (NaN, murni krn tak ada laporan): 124,183 (23.96%)
+
+======================================================================
+STEP 7 - OUTPUT TERSIMPAN
+======================================================================
+1. Data bersih (long format)         : 03_Hasil\01_data_bersih_curah_hujan_sumbar.csv
+2. Laporan kelengkapan semua stasiun : 03_Hasil\01_kelengkapan_data_semua_stasiun.csv
+3. Laporan proses (txt)              : laporan_hasil\01_laporan_data_cleaning.txt

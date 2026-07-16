@@ -1,0 +1,42 @@
+======================================================================
+STEP 6 FINAL - KLIMATOLOGI + SARIMA STEPWISE + BACKTEST + ESTIMASI
+======================================================================
+Waktu proses : 2026-07-15 09:39:14.092975
+Jumlah CPU core terdeteksi : 4
+Jumlah stasiun : 129
+Rentang data historis : 2015-01-01 s/d 2025-12-31
+
+======================================================================
+STEP 6A - KLIMATOLOGI HARMONIK (4 pasang sin/cos)
+======================================================================
+Klimatologi harmonik selesai untuk 129 stasiun (47,085 baris) dalam 56.5 detik.
+
+======================================================================
+STEP 6B - SARIMA STEPWISE SEARCH (paralel per stasiun)
+======================================================================
+Proyeksi ke depan : 36 bulan
+Tuning SARIMA selesai dalam 289.9 detik.
+SARIMA berhasil di-tuning : 129 stasiun
+SARIMA gagal (fallback rata-rata bulanan historis): 0 stasiun
+
+======================================================================
+STEP 6C - BACKTEST (hold-out 2 tahun terakhir, paralel)
+======================================================================
+Cutoff backtest : 2023-12-31 | Data test : 24 bulan
+Backtest selesai dalam 234.2 detik untuk 129 stasiun
+MAE rata-rata (mm/bulan)  : 3.91
+RMSE rata-rata (mm/bulan) : 5.06
+
+======================================================================
+STEP 6D - ESTIMASI HARIAN (klimatologi harmonik x faktor skala SARIMA)
+======================================================================
+Tabel estimasi selesai: 141,384 baris
+
+======================================================================
+OUTPUT TERSIMPAN
+======================================================================
+1. Klimatologi harmonik              : 03_Hasil\06_klimatologi_harmonik_stasiun.csv
+2. Estimasi risiko historis s/d 2028 : 03_Hasil\06_estimasi_risiko_historis_2026_2028.csv
+3. Order SARIMA terbaik per stasiun  : 03_Hasil\06_sarima_order_terbaik_per_stasiun.csv
+4. Laporan akurasi (backtest 2 th)   : 03_Hasil\06_backtest_akurasi_2tahun.csv
+5. Laporan proses (txt)              : laporan_hasil\06_laporan_klimatologi_estimasi.txt

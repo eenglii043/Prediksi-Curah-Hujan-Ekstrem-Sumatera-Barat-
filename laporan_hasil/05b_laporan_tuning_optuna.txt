@@ -1,0 +1,89 @@
+======================================================================
+STEP 5B - HYPERPARAMETER TUNING XGBOOST (OPTUNA)
+======================================================================
+Waktu proses : 2026-07-15 07:43:48.877538
+File input   : 03_Hasil/05_data_dengan_fitur_sarima.csv
+Jumlah baris  : 514,323
+Jumlah fitur  : 31
+
+Jumlah fold untuk tuning: 2
+  Fold 1: train=171,441 (1,836 positif) | test=171,441 (6,288 positif)
+  Fold 2: train=342,882 (8,124 positif) | test=171,441 (7,968 positif)
+
+Sampling data training saat SEARCH (frac negatif=0.35, semua positif dipertahankan):
+  Fold 1 (sampled): train=61,197 (1,836 positif)
+  Fold 2 (sampled): train=125,289 (8,124 positif)
+
+======================================================================
+STEP 5B-1 - OPTUNA SEARCH (12 trial, target maksimal PR-AUC)
+======================================================================
+
+Jumlah trial selesai: 12
+PR-AUC terbaik (rata-rata 2 fold): 0.0915
+
+Hyperparameter terbaik:
+  n_estimators: 133
+  max_depth: 3
+  learning_rate: 0.03978847079415015
+  subsample: 0.7467143880908638
+  colsample_bytree: 0.7171781358782057
+  min_child_weight: 9
+  gamma: 3.0976697156679958
+  reg_alpha: 0.26837193414400196
+  reg_lambda: 0.0013326772779341549
+
+======================================================================
+STEP 5B-2 - MODEL FINAL (hyperparameter hasil tuning)
+======================================================================
+ROC-AUC (fold terakhir): 0.7092
+PR-AUC  (fold terakhir): 0.1123
+Threshold terbaik (F1) : 0.711
+  Precision: 0.1139 | Recall: 0.3076 | F1: 0.1662
+
+--- Classification report (threshold tuned 0.711) ---
+              precision    recall  f1-score   support
+
+           0     0.9632    0.8834    0.9216    163473
+           1     0.1139    0.3076    0.1662      7968
+
+    accuracy                         0.8566    171441
+   macro avg     0.5386    0.5955    0.5439    171441
+weighted avg     0.9237    0.8566    0.8864    171441
+
+
+Confusion Matrix:
+                 Prediksi Tidak Ekstrem | Prediksi Ekstrem
+Aktual Tidak Ekstrem:     144,405         |     19,068
+Aktual Ekstrem:             5,517         |      2,451
+
+======================================================================
+STEP 5B-3 - VALIDASI 5-FOLD PENUH (hyperparameter hasil tuning)
+======================================================================
+  Fold 1: ROC-AUC=0.6970 | PR-AUC=0.0301 | F1(0.5)=0.0536
+  Fold 2: ROC-AUC=0.6727 | PR-AUC=0.0804 | F1(0.5)=0.0910
+  Fold 3: ROC-AUC=0.6432 | PR-AUC=0.0586 | F1(0.5)=0.0975
+  Fold 4: ROC-AUC=0.6662 | PR-AUC=0.0805 | F1(0.5)=0.1293
+  Fold 5: ROC-AUC=0.7410 | PR-AUC=0.1171 | F1(0.5)=0.1449
+
+Rata-rata 5-fold (tuned): ROC-AUC=0.6840, PR-AUC=0.0734, F1=0.1033
+
+Top 15 fitur (model tuned):
+                fitur  importance
+          ROLL_MAX_30    0.164772
+          ROLL_MAX_14    0.158714
+           ROLL_MAX_7    0.083672
+               LAG_14    0.047380
+RAINFALL_TETANGGA_AVG    0.044463
+       SARIMA_MUSIMAN    0.040744
+          CONSEC_RAIN    0.039488
+            COS_BULAN    0.036875
+                BULAN    0.034914
+           HARI_TAHUN    0.030961
+       COS_HARI_TAHUN    0.027390
+        SARIMA_RESIDU    0.023805
+ TETANGGA_ROLL_MEAN_7    0.022610
+       SIN_HARI_TAHUN    0.022534
+          ROLL_SUM_30    0.021932
+
+Model final (hasil tuning) disimpan -> 03_Hasil/model/xgboost_model_final.pkl (menimpa model Step 5 lama)
+Metadata diperbarui -> 03_Hasil/model/metadata.pkl
